@@ -2,5 +2,10 @@
 	"out": "docs",
 	"excludeInternal": true,
 	"name": "Quench",
+	"externalSymbolLinkMappings": {
+		"global": {
+			"Hooks.callAll": "https://foundryvtt.com/api/classes/client.Hooks.html#callAll"
+		}
+	},
 	"entryPoints": ["./src/module/index.ts", "./src/module/hooks.d.ts"]
 }
