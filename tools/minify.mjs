@@ -23,7 +23,7 @@ export function forceMinifyEsm() {
 						keep_classnames: true,
 						ecma: 2020,
 						module: true,
-						compress: { unsafe: true },
+						compress: { unsafe: false },
 						sourceMap: { content: chunk.map },
 					});
 				}
