@@ -26,7 +26,7 @@
 		"PreselectFiltersLabel": "Preselection Filters",
 		"PreselectFiltersHint": "Only batches matching this list of comma-separated filters will effectively be preselected when the world is loaded. Filters are case-insensitive and may contain wildcards (?, *, and **)",
 
-		"UploadedSnapshots": "Updated {files} snapshot files for {batches} batches",
+		"UploadedSnapshots": "Updated {files} snapshot files for {batches} batches. See the console (F12) for details.",
 
 		"WARN": {
 			"BatchAlreadyExists": "QUENCH: Test batch \"{key}\" already exists. Overwriting... "

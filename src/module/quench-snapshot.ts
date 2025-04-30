@@ -277,74 +277,64 @@ export class QuenchSnapshotManager {
 		// Ensure that all snapshot directories are created so that files can be stored
 		await createDirectoryTree(directoryTree);
 
-		// Temporarily patch `ui.notifications.info` to prevent every single upload generating a notification
-		const _info = ui.notifications?.info;
-		if (ui.notifications && _info)
-			ui.notifications.info = function (...args) {
-				if (args[0]?.includes(".snap.txt saved to")) return 0;
-				return _info.call(this, ...args);
-			};
-
 		// Upload all snapshot strings into their respective files
-		try {
-			const uploadPromises = [...this.updateQueue].map(async ({ batchKey, data, hash }) => {
-				const snapDirectory = this.getSnapDir(batchKey);
+		const uploadPromises = [...this.updateQueue].map(async ({ batchKey, data, hash }) => {
+			const snapDirectory = this.getSnapDir(batchKey);
 
-				const fileName = `${hash}.snap.txt`;
-				const newFile = new File([data], fileName, { type: "text/plain" });
-				const fileUpload = await FilePicker.upload("data", snapDirectory, newFile);
-				return {
-					batch: batchKey,
-					file: fileName,
-					status:
-						typeof fileUpload === "object" && "status" in fileUpload ? fileUpload.status : "error",
-				};
-			});
-			const responses = await Promise.all(uploadPromises);
-			const respData = responses.reduce(
-				(
-					accumulator: Record<string, { batch: string; file: string; status: string | number }[]>,
-					resp,
-				) => {
-					// biome-ignore lint/suspicious/noAssignInExpressions: avoid type error due to empty array
-					(accumulator[resp.batch] || (accumulator[resp.batch] = [])).push(resp);
-					return accumulator;
-				},
+			const fileName = `${hash}.snap.txt`;
+			const newFile = new File([data], fileName, { type: "text/plain" });
+			const fileUpload = await FilePicker.upload(
+				"data",
+				snapDirectory,
+				newFile,
 				{},
+				{
+					notify: false,
+				},
 			);
+			return {
+				batch: batchKey,
+				file: fileName,
+				status:
+					typeof fileUpload === "object" && "status" in fileUpload ? fileUpload.status : "error",
+			};
+		});
+		const responses = await Promise.all(uploadPromises);
+		const respData = responses.reduce(
+			(
+				accumulator: Record<string, { batch: string; file: string; status: string | number }[]>,
+				resp,
+			) => {
+				// biome-ignore lint/suspicious/noAssignInExpressions: avoid type error due to empty array
+				(accumulator[resp.batch] || (accumulator[resp.batch] = [])).push(resp);
+				return accumulator;
+			},
+			{},
+		);
 
-			const numberOfBatches = new Set(responses.map((r) => r.batch)).size;
-			const numberOfFiles = responses.filter((r) => r.status === "success").length;
+		const numberOfBatches = new Set(responses.map((r) => r.batch)).size;
+		const numberOfFiles = responses.filter((r) => r.status === "success").length;
 
-			// Create detailed upload report in console
-			console.group(
-				`${logPrefix}UPLOADED SNAPSHOTS (${numberOfBatches} batches, ${numberOfFiles} files)`,
-			);
-			for (const [batch, files] of Object.entries(respData)) {
-				console.groupCollapsed(`Batch: ${batch}, directory: ${this.getSnapDir(batch)}`);
-				console.table(files, ["file", "status"]);
-				console.groupEnd();
-			}
+		// Create detailed upload report in console
+		console.group(
+			`${logPrefix}UPLOADED SNAPSHOTS (${numberOfBatches} batches, ${numberOfFiles} files)`,
+		);
+		for (const [batch, files] of Object.entries(respData)) {
+			console.groupCollapsed(`Batch: ${batch}, directory: ${this.getSnapDir(batch)}`);
+			console.table(files, ["file", "status"]);
 			console.groupEnd();
-
-			this.updateQueue.clear();
-
-			if (ui.notifications && _info) {
-				// Restore original info method and create one notification for the upload
-				ui.notifications.info = _info;
-				ui.notifications.info(
-					localize("UploadedSnapshots", {
-						batches: numberOfBatches,
-						files: numberOfFiles,
-					}),
-				);
-			}
-			return responses;
-		} catch (error) {
-			// Ensure ui.notifications.info patch is reverted
-			if (ui.notifications && _info) ui.notifications.info = _info;
-			throw error;
 		}
+		console.groupEnd();
+
+		this.updateQueue.clear();
+
+		ui.notifications?.info(
+			localize("UploadedSnapshots", {
+				batches: numberOfBatches,
+				files: numberOfFiles,
+			}),
+		);
+		return responses;
 	}
 }
 
