@@ -14,25 +14,17 @@ jobs:
       - name: checkout code
         uses: actions/checkout@v4
 
-      - name: install node
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.node_version }}
+      - name: setup bun
+        uses: oven-sh/setup-bun@v1
 
-      - name: Cache Node.js modules
-        uses: actions/cache@v4
-        with:
-          path: .npm
-          key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.OS }}-node-
-            ${{ runner.OS }}-
+      - name: install dependencies
+        run: bun install --frozen-lockfile
 
-      - name: Install dependencies
-        run: npm ci --cache .npm --prefer-offline
+      - name: lint
+        run: bun run lint
 
-      - name: Lint
-        run: npm run lint
+      - name: check types
+        run: bun run types
 
   build:
     runs-on: ubuntu-latest
@@ -44,29 +36,17 @@ jobs:
         id: get_version
         uses: battila7/get-version-action@v2
 
-      - name: Install node
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.node_version }}
-          registry-url: "https://registry.npmjs.org"
+      - name: setup bun
+        uses: oven-sh/setup-bun@v1
 
-      - name: Cache Node.js modules
-        uses: actions/cache@v4
-        with:
-          path: .npm
-          key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.OS }}-node-
-            ${{ runner.OS }}-
-
-      - name: Install dependencies
-        run: npm ci --cache .npm --prefer-offline
+      - name: install dependencies
+        run: bun install --frozen-lockfile
 
       - name: Build JS
-        run: npm run build
+        run: bun run build
 
       - name: Create docs
-        run: npm run docs
+        run: bun run docs
 
       - name: Deploy docs
         uses: JamesIves/github-pages-deploy-action@v4.6.4
@@ -74,17 +54,16 @@ jobs:
           branch: gh-pages
           folder: docs
 
-      # Substitute the Manifest and Download URLs in the module.json
-      - name: Substitute Manifest and Download Links For Versioned Ones
+      # Substitute manifest/version/url/download links in the module.json, using jq
+      - name: Replace placeholders in manifest with repo/version strings
         id: sub_manifest_link_version
-        uses: microsoft/variable-substitution@v1
-        with:
-          files: "dist/module.json"
-        env:
-          version: ${{steps.get_version.outputs.version-without-v}}
-          url: https://github.com/${{github.repository}}
-          manifest: https://github.com/${{github.repository}}/releases/latest/download/module.json
-          download: https://github.com/${{github.repository}}/releases/download/${{github.event.release.tag_name}}/module.zip
+        run: |
+          jq '.version = "${{ steps.get_version.outputs.version-without-v }}"
+              .url = "https://github.com/${{github.repository}}"
+              .manifest: "https://github.com/${{github.repository}}/releases/latest/download/module.json"
+              .download: "https://github.com/${{github.repository}}/releases/download/${{github.event.release.tag_name}}/module.zip"
+              .flags.hotReload = false' dist/module.json > module.json
+          mv module.json dist/module.json
 
       # Create a zip file with all files required by the module to add to the release
       - run: zip -q module.zip -r dist
@@ -105,6 +84,6 @@ jobs:
 
       # Publish types to npm
       - name: Publish
-        run: npm publish --access public
+        run: bun publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
