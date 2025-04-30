@@ -16,7 +16,7 @@
 	"esmodules": ["quench.js"],
 	"styles": ["quench.css"],
 	"compatibility": {
-		"minimum": "13.339",
+		"minimum": "13.341",
 		"verified": "13"
 	},
 	"library": true,
