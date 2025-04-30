@@ -151,7 +151,8 @@ export function enforce(value: unknown, message?: string | Error): asserts value
  * @param [data] - Additional data
  * @returns The localized string
  */
-export function localize(key: string, data?: Record<string, unknown>): string {
+export function localize(key: string, data: Record<string, unknown> = {}): string {
+	// @ts-expect-error - Format can take objects also containing e.g. numbers
 	return game.i18n?.format(`QUENCH.${key}`, data) ?? key;
 }
 
