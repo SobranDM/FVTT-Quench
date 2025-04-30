@@ -1,6 +1,27 @@
 # Changelog
 
-All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
+
+## [0.10.0](https://github.com/Ethaks/FVTT-Quench/compare/v0.9.2...v0.10.0) (2025-04-30)
+
+
+### ⚠ BREAKING CHANGES
+
+* increase minimum Foundry version to 12
+
+* increase minimum Foundry version to 12 ([f8d80d2](https://github.com/Ethaks/FVTT-Quench/commit/f8d80d2129e0bad787e4a4b89b1313267400a193))
+
+
+### Features
+
+* allow filtering based on batch title ([8fdd100](https://github.com/Ethaks/FVTT-Quench/commit/8fdd100eb21cf80a04016a945342c5d2a1711528))
+* update for v13 ([3e161d9](https://github.com/Ethaks/FVTT-Quench/commit/3e161d9852ae3d0c63317cd198696b4d7a8e3489))
+* use ApplicationV2 for Quench results ([c23dad1](https://github.com/Ethaks/FVTT-Quench/commit/c23dad110460b2f7f719e0b6997f7cb0f37589f5))
+
+
+### Bug Fixes
+
+* add quench button to v2 sidebar again ([44f606d](https://github.com/Ethaks/FVTT-Quench/commit/44f606d8a884c5408bb98b3dd62fdfc01321905a))
 
 ### [0.9.2](https://github.com/Ethaks/FVTT-Quench/compare/v0.9.1...v0.9.2) (2023-06-19)
 
