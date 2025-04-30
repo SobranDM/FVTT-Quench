@@ -47,7 +47,8 @@ export class QuenchResults extends HandlebarsApplicationMixin(ApplicationV2)<Que
 	/**
 	 * The application's search filter, instantiated once when the app is created.
 	 */
-	#searchFilter = new SearchFilter({
+	// @ts-expect-error SearchFilter global access is deprecated, not in types yet though
+	#searchFilter = new foundry.applications.ux.SearchFilter({
 		inputSelector: "input#quench-filter",
 		contentSelector: "#quench-batches-list",
 		callback: this._onSearchFilter.bind(this),
@@ -117,8 +118,10 @@ export class QuenchResults extends HandlebarsApplicationMixin(ApplicationV2)<Que
 	}
 
 	/** @inheritDoc */
-	override _onRender(context: QuenchResultData, options: ApplicationV2.RenderOptions) {
+	// biome-ignore lint/suspicious/useAwait: Do not change the function signature
+	override async _onRender(context: QuenchResultData, options: ApplicationV2.RenderOptions) {
 		super._onRender(context, options);
+		// @ts-expect-error SearchFilter types have not been updated yet
 		this.#searchFilter.bind(this.element);
 	}
 
