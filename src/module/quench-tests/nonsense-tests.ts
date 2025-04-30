@@ -266,7 +266,7 @@ function registerPromiseTestBatch(quench: Quench) {
 function registerAsyncDynamicTestBatch(quench: Quench) {
 	quench.registerBatch(
 		"quench.examples.dynamicasync",
-		async function (context) {
+		async function (this: Mocha.Suite, context) {
 			const { it, assert, expect, before } = context;
 
 			const addIt = (title: string, fn: Mocha.Func): void => {
