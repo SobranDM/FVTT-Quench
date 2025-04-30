@@ -62,28 +62,37 @@ Hooks.on("setup", () => {
 /**
  * Inject QUENCH button in sidebar
  */
-Hooks.on("renderSidebar", (_sidebar: Application, html: HTMLElement) => {
-	const quenchButton = createNode("button");
-	quenchButton.classList.add(
-		"ui-control",
-		"plain",
-		"icon",
-		"fa-solid",
-		"fa-flask",
-		"quench-button",
-	);
-	quenchButton.setAttribute("data-tooltip", "QUENCH.Title");
-	quenchButton.addEventListener("click", () => {
-		enforce(quench);
-		quench.app.render({ force: true });
-	});
-	const li = document.createElement("li");
-	li.insertAdjacentElement("afterbegin", quenchButton);
+Hooks.on(
+	"renderSidebar",
+	(
+		_sidebar: Application,
+		html: HTMLElement,
+		_context: Record<string, unknown>,
+		options: { isFirstRender?: boolean },
+	) => {
+		if (!options.isFirstRender) return;
+		const quenchButton = createNode("button");
+		quenchButton.classList.add(
+			"ui-control",
+			"plain",
+			"icon",
+			"fa-solid",
+			"fa-flask",
+			"quench-button",
+		);
+		quenchButton.setAttribute("data-tooltip", "QUENCH.Title");
+		quenchButton.addEventListener("click", () => {
+			enforce(quench);
+			quench.app.render({ force: true });
+		});
+		const li = document.createElement("li");
+		li.insertAdjacentElement("afterbegin", quenchButton);
 
-	html
-		.querySelector("aside#sidebar .tabs.faded-ui menu li:has(button[data-action='toggleState'])")
-		?.insertAdjacentElement("beforebegin", li);
-});
+		html
+			.querySelector("aside#sidebar .tabs.faded-ui menu li:has(button[data-action='toggleState'])")
+			?.insertAdjacentElement("beforebegin", li);
+	},
+);
 
 /**
  * Show quench window on load if enabled and register example tests if enabled
