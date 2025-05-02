@@ -47,7 +47,7 @@ export class QuenchResults extends HandlebarsApplicationMixin(ApplicationV2)<Que
 	/**
 	 * The application's search filter, instantiated once when the app is created.
 	 */
-	// @ts-expect-error SearchFilter global access is deprecated, not in types yet though
+	// @ts-expect-error SearchFilter types have not been updated yet
 	#searchFilter = new foundry.applications.ux.SearchFilter({
 		inputSelector: "input#quench-filter",
 		contentSelector: "#quench-batches-list",
@@ -261,7 +261,10 @@ export class QuenchResults extends HandlebarsApplicationMixin(ApplicationV2)<Que
 		const checkElement = (element: HTMLElement, parentHasQuery = false): boolean => {
 			// Whether the element itself matches the query
 			const hasQuery = rgx.test(
-				SearchFilter.cleanQuery(element.querySelector(".runnable-title")?.textContent || ""),
+				// @ts-expect-error SearchFilter types have not been updated yet
+				foundry.applications.ux.SearchFilter.cleanQuery(
+					element.querySelector(".runnable-title")?.textContent || "",
+				),
 			);
 			const runnables = [...(element.querySelector(".runnable-list")?.children ?? [])];
 			// Whether any of the element's children match the query
@@ -303,7 +306,8 @@ export class QuenchResults extends HandlebarsApplicationMixin(ApplicationV2)<Que
 		for (const batchLi of html?.children ?? []) {
 			const batchLabel = batchLi.querySelector(".test-batch > label")?.textContent;
 			const batchMatchesQuery = batchLabel
-				? rgx.test(SearchFilter.cleanQuery(batchLabel))
+				? // @ts-expect-error SearchFilter types have not been updated yet
+					rgx.test(foundry.applications.ux.SearchFilter.cleanQuery(batchLabel))
 				: undefined;
 			let batchHasQuery = batchMatchesQuery || false;
 			for (const element of batchLi.querySelector(".runnable-list")?.children ?? []) {
