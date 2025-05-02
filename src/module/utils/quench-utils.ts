@@ -118,7 +118,9 @@ export const MODULE_ID = "quench" as const;
 
 /** Ensures {@link game} is initialized, either returning the {@link Game} instance or throwing an error. */
 export function getGame() {
-	if (!(game instanceof Game)) throw new Error("Game is not initialized yet!");
+	// @ts-expect-error - game is not defined in the global scope
+	if (!(game instanceof (foundry.Game as typeof Game)))
+		throw new Error("Game is not initialized yet!");
 	return game;
 }
 

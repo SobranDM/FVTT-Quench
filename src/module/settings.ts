@@ -1,4 +1,4 @@
-import { MODULE_ID } from "./utils/quench-utils";
+import { MODULE_ID, getGame } from "./utils/quench-utils";
 
 import fields = foundry.data.fields;
 
@@ -27,7 +27,7 @@ declare module "fvtt-types/configuration" {
  * Registers all settings
  */
 export function registerSettings(): void {
-	if (!(game instanceof Game)) throw new Error("Game is not initialized");
+	const game = getGame();
 
 	game.settings.register(MODULE_ID, "logTestDetails", {
 		name: "QUENCH.LogTestDetailsLabel",

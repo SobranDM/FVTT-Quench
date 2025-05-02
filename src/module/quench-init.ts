@@ -6,7 +6,7 @@ import { Quench } from "./quench";
 import { QuenchSnapshotManager } from "./quench-snapshot";
 import { registerExampleTests } from "./quench-tests/nonsense-tests";
 import { registerSettings } from "./settings";
-import { createNode, enforce, getFilterSetting, getGame, localize } from "./utils/quench-utils";
+import { createNode, enforce, getFilterSetting, getGame } from "./utils/quench-utils";
 import { pause } from "./utils/user-utils";
 
 import "../styles/quench.css";
