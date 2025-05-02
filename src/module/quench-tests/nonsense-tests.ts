@@ -35,6 +35,7 @@ function registerBasicPassingTestBatch(quench: Quench) {
 				});
 				it("Passing Test using should", function () {
 					const foo = { bar: "baz" };
+					foo.bar = "baz"; // to avoid the variable being dropped by optimisation
 					foo.should.have.property("bar", "baz");
 				});
 				it("Passing Test using should helper", function () {
