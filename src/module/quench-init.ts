@@ -105,10 +105,9 @@ Hooks.on("ready", async () => {
 	}
 
 	const shouldRender = getGame().settings.get("quench", "autoShowQuenchWindow");
-	if (shouldRender) quench.app.render({ force: true });
-
-	if (getGame().settings.get("quench", "autoRun")) {
-		if (shouldRender) await pause(1000);
+	const autoRun = getGame().settings.get("quench", "autoRun");
+	if (shouldRender) await quench.app.render({ force: true });
+	if (autoRun) {
 		// Only run tests included in the filter and registered as preSelected
 		quench.runBatches(getFilterSetting(), { preSelectedOnly: true });
 	}
