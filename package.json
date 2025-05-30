@@ -56,6 +56,11 @@
 	"peerDependencies": {
 		"fvtt-types": "npm:@league-of-foundry-developers/foundry-vtt-types@^13"
 	},
+	"peerDependenciesMeta": {
+		"fvtt-types": {
+			"optional": true
+		}
+	},
 	"devDependencies": {
 		"@biomejs/biome": "^1.9.4",
 		"@commitlint/cli": "^19.8.0",
