@@ -13,22 +13,20 @@ import "chai-as-promised";
 
 import "./quench-init";
 
+export type { QuenchResults } from "./apps/quench-results";
 // Expected API
 export type {
 	Quench,
 	QuenchBatchContext,
-	QuenchRegisterBatchOptions,
-	QuenchRegisterBatchFunction,
-	QuenchRunBatchOptions,
-	QuenchJsonReportOptions,
-	QuenchReports,
 	QuenchBatchData,
 	QuenchBatchKey,
+	QuenchJsonReportOptions,
+	QuenchRegisterBatchFunction,
+	QuenchRegisterBatchOptions,
+	QuenchReports,
+	QuenchRunBatchOptions,
 } from "./quench";
-
+export type { QuenchCleanedTestData, QuenchJsonReport, QuenchReporter } from "./quench-reporter";
 // Snapshots
 export type { QuenchSnapshotManager } from "./quench-snapshot";
 export type { MissingSnapshotError } from "./utils/quench-snapshot-error";
-
-export type { QuenchReporter, QuenchJsonReport, QuenchCleanedTestData } from "./quench-reporter";
-export type { QuenchResults } from "./apps/quench-results";
