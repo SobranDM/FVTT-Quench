@@ -22,16 +22,11 @@
 		"types": "tsc",
 		"build": "vite build",
 		"serve": "vite serve",
-		"prerelease": "pnpm run build && pnpm run lint",
+		"prerelease": "pnpm run lint:fix && pnpm run build && pnpm run lint",
 		"release": "commit-and-tag-version",
 		"declaration": "tsc --project tsconfig.declaration.json",
 		"docs": "typedoc",
 		"docs:watch": "typedoc --watch"
-	},
-	"commit-and-tag-version": {
-		"scripts": {
-			"postbump": "pnpm run lint:fix"
-		}
 	},
 	"repository": {
 		"type": "git",
