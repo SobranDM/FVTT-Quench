@@ -1,6 +1,6 @@
 {
 	"name": "@sobran-dm/fvtt-quench",
-	"version": "0.11.0",
+	"version": "0.11.1",
 	"description": "Types for a Foundry VTT module enabling tests using Mocha and Chai",
 	"author": "SobranDM",
 	"packageManager": "pnpm@11.9.0",
