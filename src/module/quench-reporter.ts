@@ -5,11 +5,11 @@ import type {
 	QuenchRunBatchOptions,
 } from "./quench";
 import {
-	RUNNABLE_STATES,
 	createDirectory,
 	getBatchKey,
 	getTestState,
 	logPrefix,
+	RUNNABLE_STATES,
 } from "./utils/quench-utils";
 
 declare global {
@@ -229,7 +229,7 @@ export class QuenchReporter extends Mocha.reporters.Base {
 
 		if (directory) await createDirectory(directory);
 		const file = new File([json], filename, { type: "text/plain" });
-		await FilePicker.upload("data", directory ?? "", file);
+		await foundry.applications.apps.FilePicker.upload("data", directory ?? "", file);
 	}
 
 	/**
@@ -298,7 +298,7 @@ export class QuenchReporter extends Mocha.reporters.Base {
 	 * Determines whether the setting to show detailed log results is enabled
 	 */
 	private static _shouldLogTestDetails(): boolean {
-		return game.settings?.get("quench", "logTestDetails") ?? false;
+		return Boolean(game.settings?.get("quench", "logTestDetails"));
 	}
 }
 

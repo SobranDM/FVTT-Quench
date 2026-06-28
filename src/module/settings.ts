@@ -1,27 +1,6 @@
-import { MODULE_ID, getGame } from "./utils/quench-utils";
+import { getGame, MODULE_ID } from "./utils/quench-utils";
 
 import fields = foundry.data.fields;
-
-type BooleanSetting<Initial extends boolean = false> = fields.BooleanField<{
-	required: true;
-	initial: Initial;
-}>;
-
-declare module "fvtt-types/configuration" {
-	interface SettingConfig {
-		"quench.logTestDetails": BooleanSetting<true>;
-		"quench.exampleTests": BooleanSetting<false>;
-		"quench.collapseSuccessful": BooleanSetting<false>;
-		"quench.autoShowQuenchWindow": BooleanSetting<false>;
-		"quench.autoRun": BooleanSetting<false>;
-		"quench.preselectFilters": fields.StringField<{
-			required: true;
-			initial: "**";
-			blank: true;
-			nullable: false;
-		}>;
-	}
-}
 
 /**
  * Registers all settings

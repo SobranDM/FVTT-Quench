@@ -177,8 +177,8 @@ function registerSnapshotTestBatch(quench: Quench) {
 					"Some Test ¯\\_(ツ)_/¯".should.matchSnapshot();
 				});
 				it("Passing Test using temporary actor", function () {
-					const type = Actor.TYPES[0];
-					const actor = new Actor.implementation({ name: "Test Actor", type });
+					const type = foundry.documents.Actor.TYPES[0];
+					const actor = new foundry.documents.Actor.implementation({ name: "Test Actor", type });
 					expect(actor).to.matchSnapshot();
 				});
 			});
@@ -267,6 +267,7 @@ function registerPromiseTestBatch(quench: Quench) {
 function registerAsyncDynamicTestBatch(quench: Quench) {
 	quench.registerBatch(
 		"quench.examples.dynamicasync",
+		// biome-ignore lint/suspicious/useAwait: batch callback may become async in future examples
 		async function (this: Mocha.Suite, context) {
 			const { it, assert, expect, before } = context;
 

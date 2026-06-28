@@ -4,7 +4,6 @@ import { copy } from "@guanghechen/rollup-plugin-copy";
 import { visualizer } from "rollup-plugin-visualizer";
 import { defineConfig } from "vite";
 import checker from "vite-plugin-checker";
-import packageJSON from "./package.json" with { type: "json" };
 import { resolveUrl } from "./tools/foundry-config.mjs";
 import { forceMinifyEsm } from "./tools/minify.mjs";
 
@@ -35,9 +34,6 @@ const config = defineConfig(({ mode }) => ({
 	css: {
 		devSourcemap: true,
 	},
-	optimizeDeps: {
-		esbuildOptions: { target: "es2022" },
-	},
 	build: {
 		outDir: resolve("dist"),
 		emptyOutDir: true,
@@ -64,7 +60,9 @@ const config = defineConfig(({ mode }) => ({
 	},
 	plugins: [
 		checker({
-			typescript: true,
+			typescript: {
+				tsconfigPath: resolve("tsconfig.json"),
+			},
 		}),
 		forceMinifyEsm(),
 		visualizer({

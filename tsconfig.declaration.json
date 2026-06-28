@@ -4,6 +4,9 @@
 		"noEmit": false,
 		"declaration": true,
 		"emitDeclarationOnly": true,
+		"rootDir": "src/module",
 		"outDir": "lib"
-	}
+	},
+	"include": ["src/module/**/*.ts", "src/types/foundry-shim.d.ts", "src/styles/quench.css.d.ts"],
+	"exclude": ["src/module/quench-tests/**"]
 }

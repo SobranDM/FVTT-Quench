@@ -1,20 +1,18 @@
 import * as Diff from "diff";
 
-import type { AnyObject } from "fvtt-types/utils";
-
 import type { Quench, QuenchBatchKey } from "../quench";
-import { type RUNNABLE_STATE, getBatchKey } from "../utils/quench-utils";
-
 import { MissingSnapshotError } from "../utils/quench-snapshot-error";
 import {
-	RUNNABLE_STATES,
 	createNode,
 	enforce,
+	getBatchKey,
 	getFilterSetting,
 	getGame,
 	getSuiteState,
 	getTestState,
 	localize,
+	type RUNNABLE_STATE,
+	RUNNABLE_STATES,
 	serialize,
 	toggleHidden,
 } from "../utils/quench-utils";
@@ -23,12 +21,14 @@ import { pause } from "../utils/user-utils";
 import ApplicationV2 = foundry.applications.api.ApplicationV2;
 import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
 
+const QuenchResultsApplication = HandlebarsApplicationMixin(ApplicationV2) as typeof ApplicationV2;
+
 /**
  * The visual UI for representing Quench test batches and the tests results thereof.
  *
  * @internal
  */
-export class QuenchResults extends HandlebarsApplicationMixin(ApplicationV2)<QuenchResultData> {
+export class QuenchResults extends QuenchResultsApplication {
 	/** The `Quench` instance this `Application` is used by */
 	quench: Quench;
 
@@ -47,7 +47,6 @@ export class QuenchResults extends HandlebarsApplicationMixin(ApplicationV2)<Que
 	/**
 	 * The application's search filter, instantiated once when the app is created.
 	 */
-	// @ts-expect-error SearchFilter types have not been updated yet
 	#searchFilter = new foundry.applications.ux.SearchFilter({
 		inputSelector: "input#quench-filter",
 		contentSelector: "#quench-batches-list",
@@ -100,6 +99,7 @@ export class QuenchResults extends HandlebarsApplicationMixin(ApplicationV2)<Que
 	/* -------------------------------------------- */
 
 	/** @inheritDoc */
+	// biome-ignore lint/suspicious/useAwait: ApplicationV2 override must stay async
 	override async _prepareContext(_options: ApplicationV2.RenderOptions): Promise<QuenchResultData> {
 		const filterSetting = getFilterSetting();
 		const preselected = this.quench._filterBatches(filterSetting, {
@@ -121,7 +121,6 @@ export class QuenchResults extends HandlebarsApplicationMixin(ApplicationV2)<Que
 	// biome-ignore lint/suspicious/useAwait: Do not change the function signature
 	override async _onRender(context: QuenchResultData, options: ApplicationV2.RenderOptions) {
 		super._onRender(context, options);
-		// @ts-expect-error SearchFilter types have not been updated yet
 		this.#searchFilter.bind(this.element);
 	}
 
@@ -171,9 +170,8 @@ export class QuenchResults extends HandlebarsApplicationMixin(ApplicationV2)<Que
 	 */
 	static async _onOpenSettings(this: QuenchResults, _event: Event, _target: HTMLElement) {
 		const config = getGame().settings.sheet;
-		await config.render(true, { focus: true });
-		// @ts-expect-error Application type not yet correct
-		config.changeTab("quench", "categories");
+		await config.render({ force: true });
+		config.changeTab("quench", "categories", { force: true });
 	}
 
 	/**
@@ -261,7 +259,6 @@ export class QuenchResults extends HandlebarsApplicationMixin(ApplicationV2)<Que
 		const checkElement = (element: HTMLElement, parentHasQuery = false): boolean => {
 			// Whether the element itself matches the query
 			const hasQuery = rgx.test(
-				// @ts-expect-error SearchFilter types have not been updated yet
 				foundry.applications.ux.SearchFilter.cleanQuery(
 					element.querySelector(".runnable-title")?.textContent || "",
 				),
@@ -306,8 +303,7 @@ export class QuenchResults extends HandlebarsApplicationMixin(ApplicationV2)<Que
 		for (const batchLi of html?.children ?? []) {
 			const batchLabel = batchLi.querySelector(".test-batch > label")?.textContent;
 			const batchMatchesQuery = batchLabel
-				? // @ts-expect-error SearchFilter types have not been updated yet
-					rgx.test(foundry.applications.ux.SearchFilter.cleanQuery(batchLabel))
+				? rgx.test(foundry.applications.ux.SearchFilter.cleanQuery(batchLabel))
 				: undefined;
 			let batchHasQuery = batchMatchesQuery || false;
 			for (const element of batchLi.querySelector(".runnable-list")?.children ?? []) {
@@ -467,10 +463,7 @@ export class QuenchResults extends HandlebarsApplicationMixin(ApplicationV2)<Que
 		}
 	}
 
-	private static _getErrorDiff(error: {
-		actual: unknown;
-		expected: unknown;
-	}): HTMLElement {
+	private static _getErrorDiff(error: { actual: unknown; expected: unknown }): HTMLElement {
 		const diffNode = createNode("div", { attr: { class: "diff" } });
 
 		const expected =
@@ -482,7 +475,6 @@ export class QuenchResults extends HandlebarsApplicationMixin(ApplicationV2)<Que
 			// Compact layout for single line values (e.g. comparing numbers)
 			diffNode.insertAdjacentHTML(
 				"beforeend",
-				// biome-ignore lint/style/useTemplate: readability
 				'<span class="expected">- ' +
 					localize("Expected") +
 					": " +
@@ -496,7 +488,6 @@ export class QuenchResults extends HandlebarsApplicationMixin(ApplicationV2)<Que
 			// Full diff layout for longer diffs
 			diffNode.insertAdjacentHTML(
 				"beforeend",
-				// biome-ignore lint/style/useTemplate: readability
 				'<span class="expected">- ' +
 					localize("Expected") +
 					' </span><span class="actual">+ ' +
@@ -645,7 +636,15 @@ export class QuenchResults extends HandlebarsApplicationMixin(ApplicationV2)<Que
 	 * @param test - The failed test
 	 * @param error - The error thrown by the test
 	 */
-	handleTestFail(test: Mocha.Test | Mocha.Hook, error: Chai.AssertionError | MissingSnapshotError) {
+	handleTestFail(
+		test: Mocha.Test | Mocha.Hook,
+		error: Error & {
+			showDiff?: boolean;
+			expected?: unknown;
+			actual?: unknown;
+			snapshotError?: boolean;
+		},
+	) {
 		// Hooks failures are reported as test failures, but presented as suite failures in the UI
 		const isHookFail = test.type === "hook";
 		const testLi: HTMLLIElement | null = isHookFail
@@ -672,7 +671,10 @@ export class QuenchResults extends HandlebarsApplicationMixin(ApplicationV2)<Que
 
 		// When possible, create a diff and render it into the error element
 		if ("showDiff" in error && error.showDiff && "expected" in error && "actual" in error) {
-			const diff = QuenchResults._getErrorDiff(error);
+			const diff = QuenchResults._getErrorDiff({
+				expected: error.expected,
+				actual: error.actual,
+			});
 			errorElement.append(diff);
 		}
 
@@ -764,7 +766,7 @@ export class QuenchResults extends HandlebarsApplicationMixin(ApplicationV2)<Que
 	}
 }
 
-interface QuenchResultData extends AnyObject {
+interface QuenchResultData extends Record<string, unknown> {
 	anyBatches: boolean;
 	batches: { name: string; displayName: string; selected: boolean }[];
 }

@@ -75,7 +75,7 @@ export class Quench {
 	 *
 	 * @internal
 	 */
-	declare readonly _testBatches: Collection<QuenchBatchData>;
+	declare readonly _testBatches: foundry.utils.Collection<QuenchBatchData>;
 
 	/**
 	 * The current Mocha runner, if any
@@ -114,7 +114,7 @@ export class Quench {
 				value: new QuenchSnapshotManager(this),
 			},
 			_testBatches: {
-				value: new Collection(),
+				value: new foundry.utils.Collection(),
 			},
 		});
 	}
@@ -129,7 +129,7 @@ export class Quench {
 	 */
 	_filterBatches(pattern: string | string[], { preSelectedOnly = false } = {}): QuenchBatchKey[] {
 		const isMatch = wcmatch(pattern, { separator: ".", flags: "i" });
-		const batches = this._testBatches.filter(({ key, preSelected }) => {
+		const batches = this._testBatches.filter(({ key, preSelected }: QuenchBatchData) => {
 			if (preSelectedOnly && !preSelected) return false;
 			return isMatch(key);
 		});

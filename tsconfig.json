@@ -2,7 +2,7 @@
 	"compilerOptions": {
 		"module": "ESNext",
 		"target": "ESNext",
-		"types": ["fvtt-types", "@types/mocha", "vite/client"],
+		"types": ["mocha"],
 		"esModuleInterop": true,
 		"moduleResolution": "bundler",
 		"strictNullChecks": true,
@@ -12,9 +12,9 @@
 		"exactOptionalPropertyTypes": true,
 		"strict": true,
 		"lib": ["DOM", "DOM.Iterable", "ES2023"],
-		"skipLibCheck": false,
+		"skipLibCheck": true,
 		"noEmit": true
 	},
 	"exclude": ["dist", "foundry"],
-	"include": ["src/**/*.ts"]
+	"include": ["src/**/*.ts", "src/types/**/*.d.ts"]
 }

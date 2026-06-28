@@ -1,4 +1,5 @@
 import fnv1a from "@sindresorhus/fnv1a";
+import type { Quench, QuenchBatchKey } from "./quench";
 import { MissingSnapshotError } from "./utils/quench-snapshot-error";
 import {
 	createDirectoryTree,
@@ -10,8 +11,6 @@ import {
 	serialize,
 	truncate,
 } from "./utils/quench-utils";
-
-import type { Quench, QuenchBatchKey } from "./quench";
 
 declare global {
 	namespace Chai {
@@ -35,9 +34,6 @@ declare global {
 		interface Assertion {
 			/** Asserts equality of a test's serialised value (actual) and previously stored snapshot (expected) */
 			matchSnapshot: () => void;
-		}
-		interface AssertionError {
-			snapshotError?: boolean;
 		}
 	}
 }
@@ -206,7 +202,10 @@ export class QuenchSnapshotManager {
 		const batchPromises = batchKeys.map(async (batchKey: string) => {
 			const snapDirectory = this.getSnapDir(batchKey);
 			try {
-				const browseResponse = await FilePicker.browse("data", snapDirectory);
+				const browseResponse = await foundry.applications.apps.FilePicker.browse(
+					"data",
+					snapDirectory,
+				);
 				const files = browseResponse?.files;
 				if (!files) return;
 
@@ -283,7 +282,7 @@ export class QuenchSnapshotManager {
 
 			const fileName = `${hash}.snap.txt`;
 			const newFile = new File([data], fileName, { type: "text/plain" });
-			const fileUpload = await FilePicker.upload(
+			const fileUpload = await foundry.applications.apps.FilePicker.upload(
 				"data",
 				snapDirectory,
 				newFile,
@@ -296,7 +295,9 @@ export class QuenchSnapshotManager {
 				batch: batchKey,
 				file: fileName,
 				status:
-					typeof fileUpload === "object" && "status" in fileUpload ? fileUpload.status : "error",
+					fileUpload && typeof fileUpload === "object" && "status" in fileUpload
+						? fileUpload.status
+						: "error",
 			};
 		});
 		const responses = await Promise.all(uploadPromises);

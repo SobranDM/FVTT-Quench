@@ -166,7 +166,9 @@ The types can then be used by adding them to the `types` section of your `tsconf
 ```
 
 By default, the `quench` global is typed as `Quench | undefined`.
-To access it, you have to use a type guard or explicitly type it as initialized and present by adding a `quench` property to the global `LenientGlobalVariableTypes` interface (see [foundry-vtt-type's FAQ](https://github.com/League-of-Foundry-Developers/foundry-vtt-types/wiki/FAQ#why-cant-i-access-any-properties-on-game--canvas))
+To access it after the `"quenchReady"` hook (or in a `"quenchReady"` callback), use a type guard or assert that `quench` is defined — for example `if (!quench) return;` before calling `quench.registerBatch(...)`.
+
+Foundry VTT globals (`game`, `Hooks`, etc.) are not included in `@ethaks/fvtt-quench`. Provide your own ambient types or use a community Foundry type package if you need them in test modules.
 
 ### Conventions
 

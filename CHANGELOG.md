@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [Unreleased]
+
+### ⚠ BREAKING CHANGES
+
+* remove `fvtt-types` peer dependency; consumers should supply their own Foundry ambient types
+* bump fast-check to v4
+
+
+### Features
+
+* Foundry v14 compatibility
+
+
+### Bug Fixes
+
+* show the results window when auto-run is enabled on load
+* fix deprecation warnings for legacy global API access
+* fix example tests failing in minified release builds
+
 ## [0.10.0](https://github.com/Ethaks/FVTT-Quench/compare/v0.9.2...v0.10.0) (2025-04-30)
 
 

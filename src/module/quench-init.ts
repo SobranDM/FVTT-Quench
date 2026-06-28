@@ -7,7 +7,6 @@ import { QuenchSnapshotManager } from "./quench-snapshot";
 import { registerExampleTests } from "./quench-tests/nonsense-tests";
 import { registerSettings } from "./settings";
 import { createNode, enforce, getFilterSetting, getGame } from "./utils/quench-utils";
-import { pause } from "./utils/user-utils";
 
 import "../styles/quench.css";
 
@@ -16,7 +15,7 @@ declare global {
 	 * The singleton instance of the {@link Quench} class, containing the primary public API.
 	 * Initialized in the Quench module's {@link Hooks.StaticCallbacks.init "init"} hook.
 	 */
-	var quench: "quenchReady" extends keyof AssumeHookRan ? Quench : Quench | undefined;
+	var quench: Quench | undefined;
 
 	namespace Hooks {
 		interface StaticCallbacks {
@@ -65,7 +64,7 @@ Hooks.on("setup", () => {
 Hooks.on(
 	"renderSidebar",
 	(
-		_sidebar: Application,
+		_sidebar: foundry.applications.sidebar.Sidebar,
 		html: HTMLElement,
 		_context: Record<string, unknown>,
 		options: { isFirstRender?: boolean },

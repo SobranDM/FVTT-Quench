@@ -116,11 +116,9 @@ export const logPrefix = "QUENCH | " as const;
  */
 export const MODULE_ID = "quench" as const;
 
-/** Ensures {@link game} is initialized, either returning the {@link Game} instance or throwing an error. */
-export function getGame() {
-	// @ts-expect-error - game is not defined in the global scope
-	if (!(game instanceof (foundry.Game as typeof Game)))
-		throw new Error("Game is not initialized yet!");
+/** Ensures {@link game} is initialized, either returning the {@link foundry.Game} instance or throwing an error. */
+export function getGame(): foundry.Game {
+	if (!(game instanceof foundry.Game)) throw new Error("Game is not initialized yet!");
 	return game;
 }
 
@@ -154,7 +152,6 @@ export function enforce(value: unknown, message?: string | Error): asserts value
  * @returns The localized string
  */
 export function localize(key: string, data: Record<string, unknown> = {}): string {
-	// @ts-expect-error - Format can take objects also containing e.g. numbers
 	return game.i18n?.format(`QUENCH.${key}`, data) ?? key;
 }
 
@@ -244,8 +241,8 @@ export function nonNullable<T>(value: T): value is NonNullable<T> {
  * @return An array of trimmed strings containing batch key filters
  */
 export function getFilterSetting(): string[] {
-	const filterSetting = game.settings?.get(MODULE_ID, "preselectFilters") ?? "";
-	return filterSetting.split(",").map((s) => s.trim());
+	const filterSetting = String(game.settings?.get(MODULE_ID, "preselectFilters") ?? "");
+	return filterSetting.split(",").map((s: string) => s.trim());
 }
 
 /**
@@ -284,7 +281,7 @@ export async function createDirectory(
 		let directoryExists = false;
 		try {
 			// Attempt directory creation
-			const resp = await FilePicker.createDirectory("data", path);
+			const resp = await foundry.applications.apps.FilePicker.createDirectory("data", path);
 			if (resp) directoryExists = true;
 		} catch (thrownError) {
 			// Confirm directory existence with expected EEXIST error, throw unexpected errors
