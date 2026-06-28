@@ -5,29 +5,22 @@
 </h1>
 
 <p style="text-align: center" align="center">
-  <img alt="GitHub Workflow Status" src="https://img.shields.io/github/actions/workflow/status/Ethaks/FVTT-Quench/check.yml?branch=master">
-  <a href="https://github.com/Ethaks/FVTT-Quench/releases/latest">
-    <img src="https://img.shields.io/github/downloads/Ethaks/FVTT-Quench/latest/module.zip" alt="Downloads" />
-  </a>
-  <a href="https://forge-vtt.com/bazaar#package=quench">
-    <img src="https://img.shields.io/badge/dynamic/json?label=Forge%20Installs&query=package.installs&suffix=%25&url=https%3A%2F%2Fforge-vtt.com%2Fapi%2Fbazaar%2Fpackage%2Fquench&colorB=4aa94a" alt="Forge Install %" />
-  </a>
-  <a href="https://www.npmjs.com/package/@ethaks/fvtt-quench">
-    <img alt="npm (scoped)" src="https://img.shields.io/npm/v/@ethaks/fvtt-quench?color=g&logo=npm">
+  <img alt="GitHub Workflow Status" src="https://img.shields.io/github/actions/workflow/status/SobranDM/FVTT-Quench/check.yml?branch=master">
+  <a href="https://github.com/SobranDM/FVTT-Quench/releases/latest">
+    <img src="https://img.shields.io/github/downloads/SobranDM/FVTT-Quench/latest/module.zip" alt="Downloads" />
   </a>
   <br />
-  <a href="https://www.foundryvtt-hub.com/package/quench/">
-    <img src="https://img.shields.io/endpoint?logoColor=white&url=https%3A%2F%2Fwww.foundryvtt-hub.com%2Fwp-json%2Fhubapi%2Fv1%2Fpackage%2Fquench%2Fshield%2Fendorsements" alt="Foundry Hub Endorsements" />
-  </a>
-  <img src="https://img.shields.io/endpoint?url=https://foundryshields.com/version?url=https://github.com/Ethaks/FVTT-Quench/releases/latest/download/module.json" alt="Supported Foundry Versions" />
+  <img src="https://img.shields.io/endpoint?url=https://foundryshields.com/version?url=https://github.com/SobranDM/FVTT-Quench/releases/latest/download/module.json" alt="Supported Foundry Versions" />
 </p>
+
+Fork of [Ethaks/FVTT-Quench](https://github.com/Ethaks/FVTT-Quench), maintained for Foundry v14.
 
 Harden your Foundry module or system code with end-to-end UI tests directly within Foundry.
 Powered by [Mocha](https://mochajs.org/) and also includes [Chai](https://www.chaijs.com/) and [fast-check](https://github.com/dubzzz/fast-check).
 
 Quench adds a test runner UI as a native Foundry `Application`.
 You can register test suites with quench and view them in the test runner, then run them and view the results.
-Additional API documentation can be found [here](https://ethaks.github.io/FVTT-Quench/index.html).
+Additional API documentation can be generated locally with `pnpm run docs`.
 
 ![Example Tests](media/example-tests.webp)
 
@@ -100,7 +93,7 @@ Additional examples can be found in this repository's [`nonsense-tests.ts` file]
 
 In addition to starting batch runs through the UI, Quench provides a method to run batches directly.
 This method is available through `quench.runBatches`.
-Additional information can be found in the [API documentation](https://ethaks.github.io/FVTT-Quench/index.html).
+Additional information can be found in the generated API docs (`pnpm run docs`).
 
 ```javascript
 // Run all batches
@@ -148,11 +141,11 @@ quench.registerBatch(
 
 ### Typescript
 
-Quench offers a package on npm containing its types, allowing Typescript to check for correct API usage and provide autocompletion.
-The package can be installed with
+Quench ships TypeScript declarations in `lib/` (built with `pnpm run declaration`).
+For a consuming project, add this repository as a dev dependency or reference the types path directly:
 
 ```bash
-npm install --save-dev @ethaks/fvtt-quench
+pnpm add -D github:SobranDM/FVTT-Quench
 ```
 
 The types can then be used by adding them to the `types` section of your `tsconfig.json`:
@@ -160,7 +153,7 @@ The types can then be used by adding them to the `types` section of your `tsconf
 ```json
 {
   "compilerOptions": {
-    "types": ["@ethaks/fvtt-quench"]
+    "types": ["@sobran-dm/fvtt-quench"]
   }
 }
 ```
@@ -168,7 +161,7 @@ The types can then be used by adding them to the `types` section of your `tsconf
 By default, the `quench` global is typed as `Quench | undefined`.
 To access it after the `"quenchReady"` hook (or in a `"quenchReady"` callback), use a type guard or assert that `quench` is defined — for example `if (!quench) return;` before calling `quench.registerBatch(...)`.
 
-Foundry VTT globals (`game`, `Hooks`, etc.) are not included in `@ethaks/fvtt-quench`. Provide your own ambient types or use a community Foundry type package if you need them in test modules.
+Foundry VTT globals (`game`, `Hooks`, etc.) are not included in `@sobran-dm/fvtt-quench`. Provide your own ambient types or use a community Foundry type package if you need them in test modules.
 
 ### Conventions
 

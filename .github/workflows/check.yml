@@ -8,17 +8,14 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - name: checkout code
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: setup bun
-        uses: oven-sh/setup-bun@v2
+      - name: Setup Node and pnpm
+        uses: ./.github/actions/setup-node
 
-      - name: install dependencies
-        run: bun install --frozen-lockfile
+      - name: Lint
+        run: pnpm run lint
 
-      - name: lint
-        run: bun run lint
-
-      - name: check types
-        run: bun run types
+      - name: Check types
+        run: pnpm run types
