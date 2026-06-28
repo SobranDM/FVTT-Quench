@@ -2,24 +2,71 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
-## [Unreleased]
+## 0.11.0 (2026-06-28)
+
 
 ### ⚠ BREAKING CHANGES
 
-* remove `fvtt-types` peer dependency; consumers should supply their own Foundry ambient types
-* bump fast-check to v4
+* update for Foundry v14 and remove fvtt-types
+* **deps:** bump fast-check from 3.23.2 to 4.1.1
+* increase minimum Foundry version to 12
+* remove deprecated pre-selection setting
+* remove deprecated `Quench#runAllBatches` and its options
+* **deps:** bump fast-check from 2.25.0 to 3.1.1 (#156)
+* replace preselect packages with preselect filters
+* refactor `runSelectedBatches`, `_testBatches`, and utils
+* Export types as ES module
+* **snapshots:** new hashes will differ from previous ones, breaking the
+current association of test to file
+
+* add additional linting rules ([0668ae2](https://github.com/SobranDM/FVTT-Quench/commit/0668ae2df77f59c720a9ec58289eaf0b3779d126))
+* **deps:** bump fast-check from 2.25.0 to 3.1.1 ([#156](https://github.com/SobranDM/FVTT-Quench/issues/156)) ([dbbe6c7](https://github.com/SobranDM/FVTT-Quench/commit/dbbe6c767e53d0fbed62656f8d478d1e374f3c33))
+* **deps:** bump fast-check from 3.23.2 to 4.1.1 ([21f76da](https://github.com/SobranDM/FVTT-Quench/commit/21f76dac44a7deeeabf00628b2b9f812e689db80))
+* increase minimum Foundry version to 12 ([f8d80d2](https://github.com/SobranDM/FVTT-Quench/commit/f8d80d2129e0bad787e4a4b89b1313267400a193))
+* refactor `runSelectedBatches`, `_testBatches`, and utils ([fb7f286](https://github.com/SobranDM/FVTT-Quench/commit/fb7f2865b0f5bc2af598f9f5bd8a70ccd51b9827))
+* remove deprecated `Quench#runAllBatches` and its options ([62a3595](https://github.com/SobranDM/FVTT-Quench/commit/62a359504a975e113193498f76d8034a697d142d))
+* remove deprecated pre-selection setting ([095fb60](https://github.com/SobranDM/FVTT-Quench/commit/095fb60a76199a9f4c82ce9ad29609d33a671b2f))
+* **snapshots:** use fnv1a for hashing ([732bb2a](https://github.com/SobranDM/FVTT-Quench/commit/732bb2a9e1d20d4d700bf142947407bc710a95c2))
 
 
 ### Features
 
-* Foundry v14 compatibility
+* add Chai as Promised ([584559a](https://github.com/SobranDM/FVTT-Quench/commit/584559ac70f76d6e03a237af9d00ed5fbc21a35c)), closes [#245](https://github.com/SobranDM/FVTT-Quench/issues/245)
+* add JSON report generation ([6c41d48](https://github.com/SobranDM/FVTT-Quench/commit/6c41d4820573f01c7a4f0e63630ebe47a6f2e316))
+* add option to only run preselected batches on startup ([18a59ec](https://github.com/SobranDM/FVTT-Quench/commit/18a59ec8ab9f44e5f866c880f6ab5349e7d02dbb)), closes [#117](https://github.com/SobranDM/FVTT-Quench/issues/117)
+* add preselected packages setting to limit test preselection ([582d37c](https://github.com/SobranDM/FVTT-Quench/commit/582d37c42ddc3ad60775221648d0712dc826dd5a)), closes [#117](https://github.com/SobranDM/FVTT-Quench/issues/117) [#133](https://github.com/SobranDM/FVTT-Quench/issues/133)
+* add search filter to UI ([e2c04bf](https://github.com/SobranDM/FVTT-Quench/commit/e2c04bf4f025b5abbcaf3ad4356a785f2d4752c1)), closes [#261](https://github.com/SobranDM/FVTT-Quench/issues/261)
+* add setting shortcut to QuenchResults header buttons ([a57234c](https://github.com/SobranDM/FVTT-Quench/commit/a57234c2b51d08e92618d14c2b3afe5276222b1f)), closes [#256](https://github.com/SobranDM/FVTT-Quench/issues/256)
+* allow filtering based on batch title ([8fdd100](https://github.com/SobranDM/FVTT-Quench/commit/8fdd100eb21cf80a04016a945342c5d2a1711528))
+* allow setting initial checked status at batch registration ([11c47b3](https://github.com/SobranDM/FVTT-Quench/commit/11c47b3121ed9522eaab9d8ef601272ac93bfd91))
+* display diffs for errors containing actual and expected values ([044f7af](https://github.com/SobranDM/FVTT-Quench/commit/044f7afa492544130ec4b4d500b248cef48b1d8b))
+* enable batch key filtering in settings and `quench.runBatches` ([397c8e3](https://github.com/SobranDM/FVTT-Quench/commit/397c8e3b9ff28871d73ca583610c6daf2336b3a1))
+* improve diff context trimming ([e84cbd4](https://github.com/SobranDM/FVTT-Quench/commit/e84cbd45a7d3b643d2bc6ebca7d3c913fc19b905))
+* improve diff readability ([4874eea](https://github.com/SobranDM/FVTT-Quench/commit/4874eeab5b7861ab5d67599a4e2d330e43364d35)), closes [#147](https://github.com/SobranDM/FVTT-Quench/issues/147)
+* improve display of errors thrown in hooks ([ecda47c](https://github.com/SobranDM/FVTT-Quench/commit/ecda47c462801cb3515d684b412f65f16d0c3bb6))
+* improve error message spacing ([c064cb2](https://github.com/SobranDM/FVTT-Quench/commit/c064cb24844a8c8964c399111b895c248a9642df)), closes [#146](https://github.com/SobranDM/FVTT-Quench/issues/146)
+* improve snapshot upload performance, allow updating after runs ([223c270](https://github.com/SobranDM/FVTT-Quench/commit/223c270118b20f0411f8e3693bec65b044970cbf))
+* introduce fast-check for property based testing ([d834d33](https://github.com/SobranDM/FVTT-Quench/commit/d834d33119296126c35967d97942bfc48270e76c))
+* **snapshots:** provide detailed overview for uploaded files in console ([528194e](https://github.com/SobranDM/FVTT-Quench/commit/528194ea51cb830572bc2ba138c678cec6aaed1b))
+* update for Foundry v14 and remove fvtt-types ([4e27e83](https://github.com/SobranDM/FVTT-Quench/commit/4e27e835b2c563d4f018693dd9c1840258b048e4))
+* update for v13 ([3e161d9](https://github.com/SobranDM/FVTT-Quench/commit/3e161d9852ae3d0c63317cd198696b4d7a8e3489))
+* use ApplicationV2 for Quench results ([c23dad1](https://github.com/SobranDM/FVTT-Quench/commit/c23dad110460b2f7f719e0b6997f7cb0f37589f5))
 
 
 ### Bug Fixes
 
-* show the results window when auto-run is enabled on load
-* fix deprecation warnings for legacy global API access
-* fix example tests failing in minified release builds
+* adapt to FilePicker changes in v11 ([24cad29](https://github.com/SobranDM/FVTT-Quench/commit/24cad2982ecbc9cf1012af6d30794ff03aa213b3)), closes [#306](https://github.com/SobranDM/FVTT-Quench/issues/306)
+* add quench button to v2 sidebar again ([44f606d](https://github.com/SobranDM/FVTT-Quench/commit/44f606d8a884c5408bb98b3dd62fdfc01321905a))
+* fix appearance of Quench button in collapsed sidebar ([1303d51](https://github.com/SobranDM/FVTT-Quench/commit/1303d51cf699f700f77f2fac25aeb852c72661f9))
+* fix registerBatch throwing an error in v10 ([#125](https://github.com/SobranDM/FVTT-Quench/issues/125)) ([45ca352](https://github.com/SobranDM/FVTT-Quench/commit/45ca3526ef783b640214c5bbbbb7fa2d47302f39))
+* force render the results window when automatically running tests ([64c2286](https://github.com/SobranDM/FVTT-Quench/commit/64c2286d6df8f11bb1647a0ad31849b7ae902e5c))
+* improve diff detection and display ([353e1d4](https://github.com/SobranDM/FVTT-Quench/commit/353e1d4751faf0d1257a55fdf29f860063337eb1))
+* improve diff layout, limit shown context, improve styling ([9d07b1b](https://github.com/SobranDM/FVTT-Quench/commit/9d07b1bbfb556127a0371e23004346c4f79dd6ca)), closes [#132](https://github.com/SobranDM/FVTT-Quench/issues/132)
+* only run all batches when no keys are provided at all ([e053a73](https://github.com/SobranDM/FVTT-Quench/commit/e053a73258e9d78e39dadf4c3adfda5515399c69))
+* prevent errors in diff generation when encountering `undefined` ([ed50c8a](https://github.com/SobranDM/FVTT-Quench/commit/ed50c8afaad6b54c482d41efbb8488f48e1c7152))
+* prevent snapshot updates from accumulating with runs ([f617bb5](https://github.com/SobranDM/FVTT-Quench/commit/f617bb557f265077dbd1752e5740cc9cd9962a5b))
+* **UI:** prevent Firefox from getting stuck and hiding expanded elements ([1b3b273](https://github.com/SobranDM/FVTT-Quench/commit/1b3b273517eb07a9e295349869708e36d955261c))
+* **UI:** restore indentation of nested tests in UI ([6b12575](https://github.com/SobranDM/FVTT-Quench/commit/6b12575628b7020daf8749ec897e65c237b79a16))
 
 ## [0.10.0](https://github.com/Ethaks/FVTT-Quench/compare/v0.9.2...v0.10.0) (2025-04-30)
 
