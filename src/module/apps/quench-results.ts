@@ -35,6 +35,12 @@ export class QuenchResults extends QuenchResultsApplication {
 	/** Whether the button allowing snapshot updates should be shown after a run */
 	private _enableSnapshotUpdates = false;
 
+	/** Plain-text entries for every failure (tests and hooks) recorded during the current/last run */
+	private _failures: string[] = [];
+
+	/** Statistics of the last completed run, used for the failure report header */
+	private _lastStats: Mocha.Stats | undefined;
+
 	/**
 	 * @param quench - The `Quench` instance this `Application` belongs to
 	 * @param options - Additional options
@@ -82,6 +88,7 @@ export class QuenchResults extends QuenchResultsApplication {
 			run: this._onRun,
 			abort: this._onAbort,
 			updateSnapshots: this._onUpdateSnapshots,
+			copyFailures: this._onCopyFailures,
 			expand: this._onExpander,
 			openSettings: this._onOpenSettings,
 		},
@@ -163,6 +170,26 @@ export class QuenchResults extends QuenchResultsApplication {
 	 */
 	static async _onUpdateSnapshots(this: QuenchResults, _event: Event, _target: HTMLElement) {
 		await this.quench.snapshots.updateSnapshots();
+	}
+
+	/**
+	 * Handle clicking on the "Copy Failures" button, copying a plain-text report of only the failed
+	 * tests and hooks of the last run to the clipboard.
+	 */
+	static async _onCopyFailures(this: QuenchResults, _event: Event, _target: HTMLElement) {
+		const report = this.getFailureReport();
+		if (!report) return;
+		try {
+			const clipboard = getGame().clipboard;
+			if (clipboard) await clipboard.copyPlainText(report);
+			else await navigator.clipboard.writeText(report);
+			ui.notifications?.info(localize("CopiedFailures", { count: this._failures.length }));
+		} catch (error) {
+			// Clipboard access can be denied (e.g. insecure context); fall back to the console
+			console.error(error);
+			console.log(report);
+			ui.notifications?.error(localize("CopyFailuresError"));
+		}
 	}
 
 	/**
@@ -538,6 +565,38 @@ export class QuenchResults extends QuenchResultsApplication {
 		return diffNode;
 	}
 
+	/**
+	 * Creates a plain-text representation of an expected/actual diff, mirroring {@link QuenchResults._getErrorDiff}.
+	 */
+	private static _getPlainTextDiff(error: { actual: unknown; expected: unknown }): string {
+		const expected =
+			typeof error.expected === "string" ? error.expected : serialize(error.expected);
+		const actual = typeof error.actual === "string" ? error.actual : serialize(error.actual);
+		const diff = Diff.diffLines(expected, actual);
+
+		if (diff.length === 2 && diff.every((change) => change.count === 1)) {
+			// Compact layout for single line values (e.g. comparing numbers)
+			const removed = diff.find((change) => change.removed)?.value.trimEnd() ?? "";
+			const added = diff.find((change) => change.added)?.value.trimEnd() ?? "";
+			return `- ${localize("Expected")}: ${removed}\n+ ${localize("Actual")}: ${added}`;
+		}
+
+		const lines = [`- ${localize("Expected")} / + ${localize("Actual")}`];
+		diff.forEach((part, index) => {
+			const prefix = part.removed ? "- " : part.added ? "+ " : "  ";
+			let partLines = part.value.split("\n");
+			if (partLines.at(-1) === "") partLines.pop();
+			// Trim down large blocks of unchanged content
+			if (!(part.added || part.removed) && partLines.length > 14) {
+				const start = index === 0 ? [] : partLines.slice(0, 6);
+				const end = index === diff.length - 1 ? [] : partLines.slice(-6);
+				partLines = [...start, "…", ...end];
+			}
+			for (const line of partLines) lines.push(`${prefix}${line}`.trimEnd());
+		});
+		return lines.join("\n");
+	}
+
 	private _setElementDisabled(selector: string, disabled = true) {
 		const element: HTMLButtonElement | null = this.element.querySelector(selector);
 		if (element) element.disabled = disabled;
@@ -715,6 +774,67 @@ export class QuenchResults extends QuenchResultsApplication {
 	}
 
 	/**
+	 * Called by {@link QuenchReporter} for every failure event (tests and hooks alike), storing a plain-text
+	 * description of the failure for {@link QuenchResults.getFailureReport}.
+	 *
+	 * @param runnable - The failed test or hook
+	 * @param error - The error thrown by the runnable
+	 */
+	recordFailure(
+		runnable: Mocha.Test | Mocha.Hook,
+		error: Error & { showDiff?: boolean; expected?: unknown; actual?: unknown },
+	) {
+		// Build a readable title path: batch display name, then suites, then the test/hook title,
+		// omitting the internal `<key>_root` suite
+		const batchKey = getBatchKey(runnable);
+		const titlePath = runnable.titlePath();
+		if (batchKey && titlePath[0] === `${batchKey}_root`) titlePath.shift();
+		const batchName = batchKey ? this.quench._testBatches.get(batchKey)?.displayName : undefined;
+		if (batchName) titlePath.unshift(batchName);
+
+		const lines = [`${this._failures.length + 1}) ${titlePath.join(" > ")}`];
+
+		const name = error?.name || "Error";
+		const message = error?.message ?? String(error);
+		const header = `${name}: ${message}`;
+		lines.push(header);
+
+		if (error?.showDiff && "expected" in error && "actual" in error) {
+			lines.push(
+				QuenchResults._getPlainTextDiff({ expected: error.expected, actual: error.actual }),
+			);
+		}
+
+		// Chromium stacks repeat the "Name: message" header, Firefox stacks do not
+		let stack = error?.stack ?? "";
+		if (stack.startsWith(header)) stack = stack.slice(header.length);
+		stack = stack.replace(/^\n+/, "").trimEnd();
+		if (stack) lines.push(stack);
+
+		this._failures.push(lines.join("\n"));
+	}
+
+	/**
+	 * Generates a plain-text report containing only the failures of the last run.
+	 *
+	 * @returns The report, or an empty string if the last run had no failures
+	 */
+	getFailureReport(): string {
+		if (this._failures.length === 0) return "";
+		const stats = this._lastStats;
+		const header = stats
+			? localize("FailureReportHeader", {
+					failed: stats.failures,
+					passed: stats.passes,
+					pending: stats.pending,
+					total: stats.tests,
+					duration: stats.duration,
+				})
+			: "";
+		return [header, ...this._failures].filter(Boolean).join("\n\n");
+	}
+
+	/**
 	 * Called by {@link QuenchReporter} when mocha begins a test run
 	 */
 	handleRunBegin() {
@@ -724,7 +844,10 @@ export class QuenchResults extends QuenchResultsApplication {
 		this._setElementDisabled("#quench-run");
 		toggleHidden(this.element.querySelector("#quench-abort"), false);
 		toggleHidden(this.element.querySelector("#quench-update-snapshots"), true);
+		toggleHidden(this.element.querySelector("#quench-copy-failures"), true);
 		this._enableSnapshotUpdates = false;
+		this._failures = [];
+		this._lastStats = undefined;
 	}
 
 	/**
@@ -732,6 +855,7 @@ export class QuenchResults extends QuenchResultsApplication {
 	 * @param stats - Run statistics
 	 */
 	handleRunEnd(stats: Mocha.Stats) {
+		this._lastStats = stats;
 		const failedPart = stats.failures ? localize("StatsFailed", { failed: stats.failures }) : "";
 		const passedPart = stats.passes ? localize("StatsPassed", { passed: stats.passes }) : "";
 		let statsHTML = "";
@@ -763,6 +887,8 @@ export class QuenchResults extends QuenchResultsApplication {
 		toggleHidden(this.element.querySelector("#quench-abort"), true);
 		if (this._enableSnapshotUpdates)
 			toggleHidden(this.element.querySelector("#quench-update-snapshots"), false);
+		if (this._failures.length > 0)
+			toggleHidden(this.element.querySelector("#quench-copy-failures"), false);
 	}
 }
 

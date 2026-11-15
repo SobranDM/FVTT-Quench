@@ -156,6 +156,9 @@ export class QuenchReporter extends Mocha.reporters.Base {
 				this.cache.passes.push(test);
 			})
 			.on(EVENT_TEST_FAIL, (test: Mocha.Test | Mocha.Hook, error) => {
+				// Record every failure (including hooks) for the plain-text failure report
+				app.recordFailure(test, error);
+
 				if (test.type === "hook") {
 					if (test.title.includes("before")) {
 						if (test.parent?._quench_batchRoot) app.handleBatchFail(test, error);

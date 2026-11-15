@@ -15,6 +15,7 @@ declare namespace foundry {
 		settings: ClientSettings;
 		i18n?: Localization;
 		userId?: string;
+		clipboard?: { copyPlainText(text: string): Promise<void> | void };
 	}
 
 	interface Localization {
