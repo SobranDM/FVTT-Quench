@@ -102,7 +102,8 @@ export class QuenchReporter extends Mocha.reporters.Base {
 					if (isBatchRoot) {
 						console.group(quench._testBatches.get(batchKey)?.displayName);
 					} else {
-						console.group(`Suite: ${suite.title}`, { suite });
+						// Text only: a live suite object keeps the whole run reachable from the console.
+						console.group(`Suite: ${suite.title}`);
 					}
 				}
 			})
@@ -147,9 +148,9 @@ export class QuenchReporter extends Mocha.reporters.Base {
 							stateColor = "initial";
 						}
 					}
-					console.log(`%c(${stateString}) Test Complete: ${test.title}`, `color: ${stateColor}`, {
-						test,
-					});
+					// Text only: live objects are attached to failures alone (below), since the
+					// console keeps every logged object alive while DevTools holds it.
+					console.log(`%c(${stateString}) Test Complete: ${test.title}`, `color: ${stateColor}`);
 				}
 			})
 			.on(EVENT_TEST_PASS, (test) => {
